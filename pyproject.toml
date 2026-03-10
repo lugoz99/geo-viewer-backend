@@ -1,0 +1,38 @@
+[project]
+name = "geo-viewer-platform"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
+    "sqlalchemy[asyncio]",
+    "geoalchemy2",
+    "asyncpg",
+    "psycopg2-binary",
+    "alembic",
+    "pydantic",
+    "pydantic-settings",
+    "geopandas",
+    "shapely",
+    "pyproj",
+    "fastkml",
+    "pandas",
+    "openpyxl",
+    "lxml",
+    "python-jose[cryptography]",
+    "bcrypt",
+    "passlib",
+    "httpx",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+    "black",
+    "ruff",
+]
