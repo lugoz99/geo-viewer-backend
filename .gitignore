@@ -18,6 +18,7 @@ env/
 .python-version
 
 # Environment variables
+.env.docker
 .env*
 !.env.example
 !.env.development

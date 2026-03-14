@@ -153,6 +153,12 @@ geo-viewer-platform/
 - `make local-migrate` - Aplicar migraciones locales.
 - `make local-migration name="msg"` - Crear migración local.
 
+
+| Comando | API | BD | Host |
+|---|---|---|---|
+| `docker compose up db -d` | tu máquina | Docker | `localhost` |
+| `docker compose up -d` | Docker | Docker | `db` |
+
 ### Docker Completo
 - `make build` - Construir y levantar con rebuild.
 - `make up` - Levantar contenedores.
