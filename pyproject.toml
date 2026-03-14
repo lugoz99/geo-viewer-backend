@@ -35,4 +35,5 @@ dev = [
     "httpx",
     "black",
     "ruff",
+    "python-dotenv>=1.2.2",
 ]
