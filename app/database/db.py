@@ -1,14 +1,12 @@
-import datetime
+from datetime import datetime
 from typing import AsyncGenerator
 from contextlib import asynccontextmanager
-from sqlalchemy import DateTime, pool
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
-    AsyncSession,
     async_sessionmaker,
-    AsyncEngine,
     AsyncAttrs,
 )
 from app.config.settings import get_settings as global_settings
@@ -23,51 +21,12 @@ engine = create_async_engine(
     echo=True,
 )
 
-
+# ?: ¿COMO OPTIMIZAR LOS POOL DE CONTEXIONES?
 AsyncSessionFactory = async_sessionmaker(
     engine,
     autoflush=False,
     expire_on_commit=False,
 )
-
-# def get_async_engine() -> AsyncEngine:
-#     """Returns the engine. Creates it only once (first call)."""
-#     global _engine_instance
-
-#     if _engine_instance is None:
-#         settings = get_settings()
-#         try:
-#             _engine_instance = create_async_engine(
-#                 str(settings.asyncpg_url),  # database URL
-#                 poolclass=pool.NullPool,  # no connection pool
-#                 echo=False,  # set True to see SQL queries
-#             )
-#             logger.info("Async engine created successfully")
-#         except SQLAlchemyError:
-#             logger.exception("Failed to create async engine")
-#             raise
-
-#     return _engine_instance
-
-
-# def reset_engine() -> None:
-#     """Delete the engine. Useful for tests."""
-#     global _engine_instance
-#     if _engine_instance:
-#         logger.info("Engine reset")
-#         _engine_instance = None
-
-
-# # ─── Session factory ──────────────────────────────────────
-# def get_session_factory() -> async_sessionmaker[AsyncSession]:
-#     """Creates a new session factory using the current engine."""
-#     return async_sessionmaker(
-#         get_async_engine(),
-#         class_=AsyncSession,
-#         expire_on_commit=False,  # keep data after commit
-#         autocommit=False,  # we commit manually
-#         autoflush=False,  # we flush manually
-#     )
 
 
 # ─── Session ──────────────────────────────────────────────
@@ -88,11 +47,16 @@ async def get_db() -> AsyncGenerator:
             raise  # Re-raise to be handled by appropriate handlers
 
 
-# ─── Base model ───────────────────────────────────────────
 class Base(AsyncAttrs, DeclarativeBase):
-    """All models inherit from this class."""
+    """Base class for all models. Provides created_at and updated_at timestamps."""
 
-    # Use timezone-aware datetime for all datetime columns
-    type_annotation_map = {
-        datetime.datetime: DateTime(timezone=True),
-    }
+    __abstract__ = True
+
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), comment="Timestamp when the record was created."
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(),
+        onupdate=func.now(),
+        comment="Timestamp of the last modification.",
+    )

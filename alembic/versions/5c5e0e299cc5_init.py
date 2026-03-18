@@ -8,6 +8,7 @@ Create Date: 2026-03-14 09:31:36.733935
 from typing import Sequence, Union
 
 from alembic import op
+import geoalchemy2
 import sqlalchemy as sa
 
 

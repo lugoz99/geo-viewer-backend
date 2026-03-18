@@ -13,7 +13,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from app.database.db import Base
 from app.config.settings import get_settings
-from app.models import *  # force model registration
+from app.models import *  # noqa: F403 - force model registration
 
 # ─── Alembic config ───────────────────────────────────────
 config = context.config
