@@ -1,9 +1,9 @@
 import enum
 from app.database.db import Base
 from typing import Optional, TYPE_CHECKING
-from sqlalchemy import ForeignKey, String, Enum, func
+from sqlalchemy import ForeignKey, String, Enum as SqlEnum, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import  UUID
+from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
 if TYPE_CHECKING:
@@ -27,7 +27,13 @@ class Project(Base):
     name: Mapped[str] = mapped_column(unique=True)
     description: Mapped[Optional[str]] = mapped_column(String(100))
     status: Mapped[ProjectStatus] = mapped_column(
-        Enum(ProjectStatus), default=ProjectStatus.ACTIVE
+        SqlEnum(
+            ProjectStatus,
+            name="projectstatus",
+            values_callable=lambda x: [e.value for e in x],
+            native_enum=False,
+        ),
+        default=ProjectStatus.ACTIVE,
     )
     # relationships
     owner_id: Mapped[uuid.UUID] = mapped_column(

@@ -1,5 +1,6 @@
 import enum
-from sqlalchemy import Enum, func  
+from sqlalchemy import func
+from sqlalchemy import Enum as SqlEnum
 from app.database.db import Base
 from typing import Optional, TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -23,14 +24,20 @@ class User(Base):
         UUID(as_uuid=True),
         primary_key=True,
         server_default=func.gen_random_uuid(),
-        comment="Unique identifier for the feature.",
     )
-    email: Mapped[str] = mapped_column(unique=True)
+    email: Mapped[Optional[str]] = mapped_column(unique=True)
     full_name: Mapped[str]
-    company_name: Mapped[str]
+    company_name: Mapped[str] = mapped_column(unique=True)
     is_active: Mapped[bool] = mapped_column(default=True)
     hashed_password: Mapped[str]
     photo_url: Mapped[Optional[str]] = mapped_column(default=None)
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.USER)
-    # Relationships
+    role: Mapped[UserRole] = mapped_column(
+        SqlEnum(
+            UserRole,
+            name="userrole",  
+            values_callable=lambda x: [e.value for e in x],
+            native_enum=False,
+        ),
+        default=UserRole.USER,
+    )
     projects: Mapped[list["Project"]] = relationship("Project", back_populates="owner")

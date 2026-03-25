@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Enum, ForeignKey, func
+from sqlalchemy import Enum as SqlEnum, ForeignKey, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 import enum
 from geoalchemy2 import Geometry
@@ -28,7 +28,7 @@ class Feature(Base):
     )
 
     geom: Mapped[Geometry] = mapped_column(
-        Geometry(geometry_type="GEOMETRY", srid=4326, spatial_index=True),
+        Geometry(geometry_type="GEOMETRY", srid=4326),
         nullable=False,
         comment="Native PostGIS geometry in WGS84.",
     )
@@ -39,7 +39,12 @@ class Feature(Base):
         comment="Feature attributes as key-value pairs. Flexible schema per layer.",
     )
     status: Mapped[FeatureStatus] = mapped_column(
-        Enum(FeatureStatus, name="feature_status_enum"),
+        SqlEnum(
+            FeatureStatus,
+            name="featurestatus",
+            values_callable=lambda x: [e.value for e in x],
+            native_enum=False,
+        ),
         default=FeatureStatus.ACTIVE,
         nullable=False,
         comment="Logical delete flag.",

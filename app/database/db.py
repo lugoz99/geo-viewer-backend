@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import AsyncGenerator
-from contextlib import asynccontextmanager
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.exc import SQLAlchemyError
@@ -18,7 +18,7 @@ from fastapi.exceptions import ResponseValidationError
 engine = create_async_engine(
     global_settings().asyncpg_url.unicode_string(),
     future=True,
-    echo=True,
+    echo=False,
 )
 
 # ?: ¿COMO OPTIMIZAR LOS POOL DE CONTEXIONES?
@@ -29,22 +29,18 @@ AsyncSessionFactory = async_sessionmaker(
 )
 
 
-# ─── Session ──────────────────────────────────────────────
-@asynccontextmanager
-# Dependency
-async def get_db() -> AsyncGenerator:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionFactory() as session:
         try:
+            # Provide DB session to request lifecycle
             yield session
-            await session.commit()
-        except SQLAlchemyError:
-            # Re-raise SQLAlchemy errors to be handled by the global handler
+
+        except Exception:
+            # Rollback any failed transaction
+            await session.rollback()
             raise
-        except Exception as ex:
-            # Only log actual database-related issues, not response validation
-            if not isinstance(ex, ResponseValidationError):
-                await logger.aerror(f"Database-related error: {repr(ex)}")
-            raise  # Re-raise to be handled by appropriate handlers
+
+        # session is auto-closed by async with
 
 
 class Base(AsyncAttrs, DeclarativeBase):

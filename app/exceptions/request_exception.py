@@ -7,6 +7,22 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 
+class AppException(Exception):
+    pass
+
+
+class NotFoundError(AppException):
+    pass
+
+
+class DuplicateEntityError(AppException):
+    pass
+
+
+class DatabaseError(AppException):
+    pass
+
+
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
 

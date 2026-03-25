@@ -1,13 +1,25 @@
+import enum
 from typing import TYPE_CHECKING, Optional
 from app.database.db import Base
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Boolean, Integer, ForeignKey, Enum, Text
+from sqlalchemy import String, Boolean, Integer, ForeignKey, Enum as SqlEnum, Text
 import uuid
 
 
 if TYPE_CHECKING:
     from app.models import Project, Feature
+
+
+class GeometryType(enum.Enum):
+    POINT = "point"
+    LINESTRING = "linestring"
+    POLYGON = "polygon"
+
+
+class LayerStatus(enum.Enum):
+    ACTIVE = "active"
+    DELETED = "deleted"
 
 
 class Layer(Base):
@@ -42,8 +54,13 @@ class Layer(Base):
     description: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True, comment="Optional description of what this layer contains."
     )
-    geometry_type: Mapped[str] = mapped_column(
-        Enum("point", "linestring", "polygon", name="geometry_type_enum"),
+    geometry_type: Mapped[GeometryType] = mapped_column(
+        SqlEnum(
+            GeometryType,
+            name="geometrytype",
+            values_callable=lambda x: [e.value for e in x],
+            native_enum=False,
+        ),
         nullable=False,
         comment="Type of geometry stored in this layer. Cannot be changed after creation.",
     )
@@ -64,6 +81,17 @@ class Layer(Base):
         nullable=True,
         comment="Dynamic schema of feature attributes. Auto-filled on file import from column names. Used by frontend to build filter forms without scanning all features.",
     )
+    status: Mapped[LayerStatus] = mapped_column(
+        SqlEnum(
+            LayerStatus,
+            name="layerstatus",
+            values_callable=lambda x: [e.value for e in x],
+            native_enum=False,
+        ),
+        default=LayerStatus.ACTIVE,
+        nullable=False,
+        comment="Status of the layer.",
+    )
     visible: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
@@ -75,12 +103,6 @@ class Layer(Base):
         default=0,
         nullable=False,
         comment="Stacking order on the map. Higher value = rendered on top of other layers.",
-    )
-    status: Mapped[str] = mapped_column(
-        Enum("active", "deleted", name="layer_status_enum"),
-        default="active",
-        nullable=False,
-        comment="Logical delete flag. Deleted layers are not physically removed from the database.",
     )
     feature_count: Mapped[int] = mapped_column(
         Integer,
