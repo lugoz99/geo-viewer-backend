@@ -1,5 +1,6 @@
 import uuid
 from app.schemas.custom_base import CustomBase
+from app.schemas.user import UserResponse
 
 
 class ProjectCreate(CustomBase):
@@ -23,3 +24,4 @@ class ProjectResponse(CustomBase):
     description: str | None = None
     status: str
     owner_id: uuid.UUID
+    owner: UserResponse
