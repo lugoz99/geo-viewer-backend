@@ -3,15 +3,12 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
     AsyncAttrs,
 )
 from app.config.settings import get_settings as global_settings
-from app.utils.logging import logger
-from fastapi.exceptions import ResponseValidationError
 
 # ─── Engine ───────────────────────────────────────────────
 # We save the engine here so we don't create it every time

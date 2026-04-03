@@ -1,5 +1,7 @@
 import enum
 from typing import TYPE_CHECKING, Optional
+
+from geoalchemy2 import Geometry
 from app.database.db import Base
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -104,13 +106,19 @@ class Layer(Base):
         nullable=False,
         comment="Stacking order on the map. Higher value = rendered on top of other layers.",
     )
-    feature_count: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
-        nullable=False,
-        comment="Count of active features in this layer. Kept up to date by a PostgreSQL trigger on the features table.",
+
+    bbox: Mapped[Geometry] = mapped_column(
+        Geometry(geometry_type="POLYGON", srid=4326),
+        nullable=True,
+        comment="Bounding box of the layer for fast map zooming.",
     )
 
+    srid: Mapped[int] = mapped_column(
+        Integer,
+        default=4326,
+        nullable=False,
+        comment="Spatial reference system of the original data.",
+    )
     # ── Geoprocess Fields ─────────────────────────────────────
     # These fields are only populated when the layer was generated
     # by a geoprocess operation (is_derived = True).
