@@ -56,8 +56,8 @@ class UserService:
     async def get_all_users(self) -> list[UserModel]:
         """Get all users from database"""
         # TODO: add lazy load for projects, to not load all projects with users
-        result: Result[UserModel] = await self.db.scalars(select(UserModel))
-        return result.all()
+        result = await self.db.execute(select(UserModel))
+        return result.scalars().all()
 
     async def get_user_by_id(self, user_id: uuid.UUID) -> UserModel:
         """Find one user by id"""

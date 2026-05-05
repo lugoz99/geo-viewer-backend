@@ -8,6 +8,7 @@ class ProjectCreate(CustomBase):
     description: str | None = None
     status: str = "active"
     owner_id: uuid.UUID
+    
 
 
 class ProjectUpdate(CustomBase):
@@ -23,5 +24,4 @@ class ProjectResponse(CustomBase):
     name: str
     description: str | None = None
     status: str
-    owner_id: uuid.UUID
     owner: UserResponse

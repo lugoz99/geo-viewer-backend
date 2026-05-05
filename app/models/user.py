@@ -10,6 +10,7 @@ import uuid
 # For type hinting to avoid circular imports
 if TYPE_CHECKING:
     from app.models import Project
+    from app.models import FileImport
 
 
 # Role Enum
@@ -41,3 +42,4 @@ class User(Base):
         default=UserRole.USER,
     )
     projects: Mapped[list["Project"]] = relationship("Project", back_populates="owner")
+    imports: Mapped[list["FileImport"]] = relationship("FileImport", back_populates="user")

@@ -8,7 +8,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Boolean, Integer, ForeignKey, Enum as SqlEnum, Text
 import uuid
 
-
 if TYPE_CHECKING:
     from app.models import Project, Feature
 
@@ -42,10 +41,10 @@ class Layer(Base):
         nullable=False,
         comment="Project this layer belongs to.",
     )
-    created_by: Mapped[uuid.UUID] = mapped_column(
+    created_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id"),
-        nullable=False,
+        nullable=True,
         comment="User who created this layer.",
     )
 

@@ -9,6 +9,7 @@ import uuid
 if TYPE_CHECKING:
     from app.models import User
     from app.models import Layer
+    from app.models import FileImport
 
 
 class ProjectStatus(enum.Enum):
@@ -43,3 +44,4 @@ class Project(Base):
     )
     owner: Mapped["User"] = relationship("User", back_populates="projects")
     layers: Mapped[list["Layer"]] = relationship("Layer", back_populates="project")
+    imports: Mapped[list["FileImport"]] = relationship("FileImport", back_populates="project")

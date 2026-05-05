@@ -48,4 +48,3 @@ class LayerResponse(CustomBase):
     is_derived: bool
     parent_layer_id: uuid.UUID | None = None
     geoprocess_type: str | None = None
-    feature_count: int
